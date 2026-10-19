@@ -1,0 +1,25 @@
+name: 1 - Create EC2 server
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  infrastructure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy CloudFormation stack
+        run: |
+          aws cloudformation deploy \
+            --template-file cloudformation/ec2-webserver.yaml \
+            --stack-name ec2-website \
+            --parameter-overrides KeyName=${{ secrets.EC2_KEY_NAME }} \
+            --no-fail-on-empty-changeset
