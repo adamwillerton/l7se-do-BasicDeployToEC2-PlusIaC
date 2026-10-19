@@ -1,9 +1,7 @@
 name: 2 - Deploy website
 
 on:
-  workflow_run:
-    workflows: ["1 - Create EC2 server"]
-    types: [completed]
+  workflow_call:
 
 jobs:
   deploy:
