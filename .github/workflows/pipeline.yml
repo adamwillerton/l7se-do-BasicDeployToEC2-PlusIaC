@@ -1,0 +1,15 @@
+name: Pipeline
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  infrastructure:
+    uses: ./.github/workflows/infrastructure.yml
+    secrets: inherit
+
+  deploy:
+    needs: infrastructure
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
