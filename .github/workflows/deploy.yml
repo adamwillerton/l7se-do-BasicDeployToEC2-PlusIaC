@@ -1,0 +1,27 @@
+name: 2 - Deploy website
+
+on:
+  workflow_call:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Get server IP from the stack
+        run: |
+          IP=$(aws cloudformation describe-stacks --stack-name ec2-website --query "Stacks[0].Outputs[?OutputKey=='PublicIP'].OutputValue" --output text)
+          echo "IP=$IP" >> $GITHUB_ENV
+
+      - name: Copy website files to EC2
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
+          chmod 600 key.pem
+          scp -o StrictHostKeyChecking=no -i key.pem website/* ec2-user@$IP:/var/www/html/
