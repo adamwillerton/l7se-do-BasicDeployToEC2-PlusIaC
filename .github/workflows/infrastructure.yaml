@@ -1,8 +1,7 @@
 name: 1 - Create EC2 server
 
 on:
-  push:
-    branches: [main]
+  workflow_call:
 
 jobs:
   infrastructure:
